@@ -162,6 +162,7 @@ const options: Partial<ToggleDrawerOptions> = {
 drawer.setOptions(options);
 drawer.setData(drawerData as any);
 drawer.render();
-drawer.select('212');
+drawer.select('13');
+options.onMenuItemClick!(drawerData.menuItems[0].subList![2]);
 // drawer.changeMode(false);
 drawer.close();
