@@ -58,10 +58,8 @@ export const ToggleDrawer: () => TDrawer = () => {
             return header;
         },
         renderMenuItemContent: (box: HTMLElement, item: MenuItem, level: number) => {
-            const anchorEl = document.createElement('a');
+            const anchorEl = document.createElement('div');
             anchorEl.classList.add(CLS_MENU_ITEM_ANCHOR);
-            if (item.url)
-                anchorEl.href = item.url;
 
             const iconEl = document.createElement('i');
             if (item.icon) {
@@ -78,6 +76,7 @@ export const ToggleDrawer: () => TDrawer = () => {
             box.appendChild(anchorEl);
             return anchorEl;
         },
+        onMenuItemClick: (item: MenuItem) => { console.log(item) },
     }
 
     const _data: ToggleDrawerData = {
@@ -220,41 +219,43 @@ export const ToggleDrawer: () => TDrawer = () => {
         _rootListEl = _renderRootList();
 
         _data.menuItems.map(item => {
-            const itemBox = _renderMenuItemBox(item, 0);
+            const itemBox = _renderMenuItem(item, 0);
             _rootListEl.appendChild(itemBox);
         });
 
         _rootEl.appendChild(_rootListEl);
     }
 
-    function _renderMenuItemBox(item: MenuItem, level: number) {
-        const menuItemBoxEl = document.createElement('div');
+    function _renderMenuItem(item: MenuItem, level: number) {
+        const menuItemEl = document.createElement('div');
         const clsLevel = CLS_LEVEL_PREFIX + level;
-        menuItemBoxEl.classList.add(CLS_MENU_ITEM_BOX, clsLevel);
-        menuItemBoxEl.setAttribute('data-id', item.id);
+        menuItemEl.classList.add(CLS_MENU_ITEM_BOX, clsLevel);
+        menuItemEl.setAttribute('data-id', item.id);
 
-        _renderMenuItem(menuItemBoxEl, item, level);
+        _renderMenuItemContent(menuItemEl, item, level);
 
-        menuItemBoxEl.addEventListener('click', (event) => {
+        menuItemEl.addEventListener('click', (event) => {
             event.stopPropagation();
-            _selectMenuItem(menuItemBoxEl);
+            _selectMenuItem(menuItemEl);
+            if (_options.onMenuItemClick)
+                _options.onMenuItemClick(item);
         });
 
         if (item.subList && item.subList.length > 0) {
             const subListEl = document.createElement('div');
             subListEl.className = `${CLS_MENU_ITEM_SUB_LIST}`;
             for (const child of item.subList) {
-                subListEl.appendChild(_renderMenuItemBox(child, level + 1));
+                subListEl.appendChild(_renderMenuItem(child, level + 1));
             }
-            menuItemBoxEl.appendChild(subListEl);
-            menuItemBoxEl.addEventListener('mouseenter', (event) => {
+            menuItemEl.appendChild(subListEl);
+            menuItemEl.addEventListener('mouseenter', (event) => {
                 if (_options.open) {
-                    _adjustSubListElPosition(item, menuItemBoxEl, subListEl);
+                    _adjustSubListElPosition(item, menuItemEl, subListEl);
                 }
             });
         }
-        _rootListEl.appendChild(menuItemBoxEl);
-        return menuItemBoxEl;
+        _rootListEl.appendChild(menuItemEl);
+        return menuItemEl;
     }
 
     function _selectMenuItem(menuItemBoxEl: HTMLElement) {
@@ -284,7 +285,7 @@ export const ToggleDrawer: () => TDrawer = () => {
         menuItemBoxEl.classList.add(CLS_SELECTED);
     }
 
-    function _renderMenuItem(box: HTMLElement, item: MenuItem, level: number) {
+    function _renderMenuItemContent(box: HTMLElement, item: MenuItem, level: number) {
         const contentBoxEl = document.createElement('div');
         contentBoxEl.classList.add(CLS_MENU_ITEM_CONTENT);
 

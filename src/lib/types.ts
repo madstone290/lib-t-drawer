@@ -52,8 +52,6 @@ export interface ToggleDrawerOptions {
      */
     headerTextClosed: string;
 
-
-
     /**
      * 드로어 열림 상태 변경 이벤트
      * @param open 열림 상태 

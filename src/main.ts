@@ -1,5 +1,5 @@
 import { ToggleDrawer } from "@/lib/t-drawer";
-import { ToggleDrawerData, ToggleDrawerOptions } from "./lib/types";
+import { MenuItem, ToggleDrawerData, ToggleDrawerOptions } from "./lib/types";
 
 
 const CLS_MENU_ITEM_ANCHOR = 'td-menu-item-anchor';
@@ -142,30 +142,21 @@ const options: Partial<ToggleDrawerOptions> = {
       document.documentElement.style.setProperty('--drawer-width', '300px');
     }
   },
-  renderMenuItemContent: (box: any, item: any, level: any) => {
-    const contentEl = document.createElement('div');
-    contentEl.classList.add(CLS_MENU_ITEM_ANCHOR);
-
-    const icon = document.createElement('i');
-    icon.className = item.icon;
-    icon.style.marginRight = '10px';
-    contentEl.appendChild(icon);
-
-    const nameEl = document.createElement('span');
-    nameEl.classList.add(CLS_HIDE_ON_CLOSE);
-    nameEl.innerText = item.name;
-    contentEl.appendChild(nameEl);
-
-    contentEl.addEventListener("click", function () {
+  onMenuItemClick: (item: MenuItem) => {
+    if (item.id[0] === '1' || item.id[0] === '2' || item.id[0] === '3') {
       contentBox!.replaceChildren();
       contentBox!.innerHTML = `
-                    <h1 class='flex-top'>${item.name} (${item.url})</h1>
-                    <iframe class='flex-fill' src="${item.url}" width="100%" height="100%" frameborder="0" ></iframe>
-                `;
-    });
-
-    box.appendChild(contentEl);
-    return contentEl;
+                  <h1 class='flex-top'>${item.name} (${item.url})</h1>
+                  <iframe class='flex-fill' src="${item.url}" width="100%" height="100%" frameborder="0" ></iframe>
+              `;
+    }
+    else {
+      contentBox!.replaceChildren();
+      contentBox!.innerHTML = `
+                  <h1 class='flex-top'>id: ${item.id}, name: ${item.name}, url: ${item.url}</h1>
+                  
+              `;
+    }
   }
 };
 drawer.setOptions(options);
