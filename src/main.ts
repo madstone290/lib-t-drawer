@@ -134,6 +134,7 @@ drawer.create(container);
 const options: Partial<ToggleDrawerOptions> = {
   multiSelection: true,
   showToggleBtn: true,
+  showHeader: true,
   onModeChanged: (isMini: any) => {
     if (isMini) {
       document.documentElement.style.setProperty('--drawer-width', '70px');

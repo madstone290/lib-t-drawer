@@ -29,6 +29,7 @@ export const ToggleDrawer: () => TDrawer = () => {
         open: false,
         multiSelection: false,
         showToggleBtn: true,
+        showHeader: true,
         headerTextOpen: 'Toggle Drawer',
         headerTextClosed: 'T/D',
         onModeChanged: () => { },
@@ -116,7 +117,10 @@ export const ToggleDrawer: () => TDrawer = () => {
             _renderToggleBtn();
         }
 
-        _renderHeader();
+        if (_options.showHeader) {
+            _renderHeader();
+        }
+
         _renderMenu();
     }
 

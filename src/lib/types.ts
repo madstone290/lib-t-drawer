@@ -38,6 +38,11 @@ export interface ToggleDrawerOptions {
     showToggleBtn: boolean;
 
     /**
+     * 드로어 헤더 표시 여부. 기본값은 true.
+     */
+    showHeader: boolean;
+
+    /**
      * 드로어 열림 상태일 때 헤더 텍스트. 기본값은 Toggle Drawer
      */
     headerTextOpen: string;
@@ -46,6 +51,8 @@ export interface ToggleDrawerOptions {
      * 드로어 닫힘 상태일 때 헤더 텍스트. 기본값은 T/D
      */
     headerTextClosed: string;
+
+
 
     /**
      * 드로어 열림 상태 변경 이벤트
