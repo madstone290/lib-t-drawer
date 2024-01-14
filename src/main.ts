@@ -143,6 +143,8 @@ const options: Partial<ToggleDrawerOptions> = {
     }
   },
   onMenuItemClick: (item: MenuItem) => {
+    if (item.subList)
+      return;
     if (item.id[0] === '1' || item.id[0] === '2' || item.id[0] === '3') {
       contentBox!.replaceChildren();
       contentBox!.innerHTML = `
@@ -151,6 +153,7 @@ const options: Partial<ToggleDrawerOptions> = {
               `;
     }
     else {
+
       contentBox!.replaceChildren();
       contentBox!.innerHTML = `
                   <h1 class='flex-top'>id: ${item.id}, name: ${item.name}, url: ${item.url}</h1>
