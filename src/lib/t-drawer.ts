@@ -1,17 +1,16 @@
 import '@/lib/t-drawer.css';
-import { ToggleDrawerOptions, ToggleDrawerData, MenuItem } from './types';
+import { ToggleDrawerOptions, ToggleDrawerData, MenuItem, TDrawer } from './types';
 import barsImg from '@/asset/image/bars-white-xl.svg';
 import angleLeftImg from '@/asset/image/angle-left-white.svg';
 
 
-export const ToggleDrawer = () => {
+export const ToggleDrawer: () => TDrawer = () => {
     const CLS_ROOT = 'td-root';
     const CLS_ROOT_LIST = 'td-root-list';
     const CLS_TOGGLE_BTN_BOX = 'td-toggle-btn-box';
     const CLS_TOGGLE_BTN = 'td-toggle-btn';
     const CLS_HEADER_BOX = 'td-header-box';
     const CLS_DEFAULT_HEADER = 'td-default-header';
-
 
     const CLS_MENU_ITEM_BOX = 'td-menu-item-box';
     const CLS_MENU_ITEM_CONTENT = 'td-menu-item-content';
@@ -22,32 +21,94 @@ export const ToggleDrawer = () => {
     const CLS_LEVEL_PREFIX = 'td-level-';
 
     const CLS_SELECTED = 'td-selected';
-    const CLS_MINI = 'td-mini';
-    const CLS_HIDE_IN_MINI_MODE = 'td-hide-in-mini-mode';
-    const CLS_HIDE_IN_NORMAL_MODE = 'td-hide-in-normal-mode';
+    const CLS_OPEN = 'td-open';
+    const CLS_HIDE_ON_CLOSE = 'td-hide-on-close';
+    const CLS_HIDE_ON_OPEN = 'td-hide-on-open';
 
-    let _options: ToggleDrawerOptions;
-    let _data: ToggleDrawerData;
+    const _options: ToggleDrawerOptions = {
+        open: false,
+        multiSelection: false,
+        showToggleBtn: true,
+        headerTextOpen: 'Toggle Drawer',
+        headerTextClosed: 'T/D',
+        onModeChanged: () => { },
+        renderToggleBtn: (box: HTMLElement) => {
+            const toggleBtnEl = document.createElement('img');
+            toggleBtnEl.classList.add(CLS_TOGGLE_BTN);
+            toggleBtnEl.src = barsImg;
+            box.appendChild(toggleBtnEl);
+            return toggleBtnEl;
+        },
+        renderHeader: (box: HTMLElement) => {
+            const header = document.createElement('div');
+            header.classList.add(CLS_DEFAULT_HEADER);
+
+            const textOpenEl = document.createElement('div');
+            textOpenEl.classList.add(CLS_HIDE_ON_CLOSE);
+            textOpenEl.innerText = _options.headerTextOpen;
+            header.appendChild(textOpenEl);
+
+            const textCloseEl = document.createElement('div');
+            textCloseEl.classList.add(CLS_HIDE_ON_OPEN);
+            textCloseEl.innerText = _options.headerTextClosed;
+            header.appendChild(textCloseEl);
+
+            box.appendChild(header);
+            return header;
+        },
+        renderMenuItemContent: (box: HTMLElement, item: MenuItem, level: number) => {
+            const anchorEl = document.createElement('a');
+            anchorEl.classList.add(CLS_MENU_ITEM_ANCHOR);
+            if (item.url)
+                anchorEl.href = item.url;
+
+            const iconEl = document.createElement('i');
+            if (item.icon) {
+                iconEl.className = item.icon;
+                iconEl.style.marginRight = '4px';
+            }
+
+            const nameEl = document.createElement('span');
+            nameEl.classList.add(CLS_HIDE_ON_CLOSE);
+            nameEl.innerText = item.name;
+
+            anchorEl.appendChild(iconEl);
+            anchorEl.appendChild(nameEl);
+            box.appendChild(anchorEl);
+            return anchorEl;
+        },
+    }
+
+    const _data: ToggleDrawerData = {
+        menuItems: [],
+    }
 
     let _rootEl: HTMLElement;
+    let _toggleBtnBoxEl: HTMLElement;
     let _headerBoxEl: HTMLElement;
     let _rootListEl: HTMLElement;
-
-    let _isMini: boolean = false;
 
     function create(container: HTMLElement) {
         _rootEl = document.createElement('div');
         _rootEl.classList.add(CLS_ROOT);
 
+        _toggleBtnBoxEl = document.createElement('div');
+        _toggleBtnBoxEl.classList.add(CLS_TOGGLE_BTN_BOX);
+        _rootEl.appendChild(_toggleBtnBoxEl);
+
+        _headerBoxEl = document.createElement('div');
+        _headerBoxEl.classList.add(CLS_HEADER_BOX);
+        _rootEl.appendChild(_headerBoxEl);
+
         container.appendChild(_rootEl);
     }
 
-    function setOptions(options: ToggleDrawerOptions) {
-        _options = options;
+    function setOptions(options: Partial<ToggleDrawerOptions>) {
+        Object.assign(_options, options);
     }
 
-    function setData(data: ToggleDrawerData) {
-        _data = data;
+    function setData(data: Partial<ToggleDrawerData>) {
+        Object.assign(_data, data);
     }
 
     function render() {
@@ -56,7 +117,7 @@ export const ToggleDrawer = () => {
         }
 
         _renderHeader();
-        _renderMenuItemList();
+        _renderMenu();
     }
 
     function select(id: string) {
@@ -71,34 +132,50 @@ export const ToggleDrawer = () => {
         return null;
     }
 
+    /**
+     * 열림 상태를 토글한다.
+     */
     function toggle() {
-        changeMode(!_isMini);
+        changeMode(!_options.open);
     }
 
-    function changeMode(mini: boolean) {
-
-        if (mini) {
-            _rootEl.classList.add(CLS_MINI);
+    /**
+     * 열림 상태를 변경한다.
+     * @param open 열림 상태
+     */
+    function changeMode(open: boolean) {
+        if (open) {
+            _rootEl.classList.add(CLS_OPEN);
 
         } else {
-            _rootEl.classList.remove(CLS_MINI);
+            _rootEl.classList.remove(CLS_OPEN);
         }
-        _isMini = mini;
-
         if (_options.onModeChanged)
-            _options.onModeChanged(_isMini);
+            _options.onModeChanged(open);
+        _options.open = open;
     }
 
+    /**
+     * 리스트 루트 엘리먼트를 렌더링한다.
+     * @returns 
+     */
     function _renderRootList() {
         const rootListEl = document.createElement('div');
         rootListEl.classList.add(`${CLS_ROOT_LIST}`);
         return rootListEl;
     }
 
-    function _adjustContainerElPosition(item: MenuItem, itemEl: HTMLElement, childrenContainerEl: HTMLElement) {
+    /**
+     * 서브리스트 엘리먼트의 위치를 조정하여 화면 하단을 넘어가지 않도록 한다.
+     * @param item 
+     * @param itemEl 
+     * @param subListEl 
+     * @returns 
+     */
+    function _adjustSubListElPosition(item: MenuItem, itemEl: HTMLElement, subListEl: HTMLElement) {
         if (!item.subList)
             return;
-        const containerElHeight = childrenContainerEl.offsetHeight;
+        const containerElHeight = subListEl.offsetHeight;
         const initialContainerElTop = itemEl.offsetTop - _rootEl.scrollTop;
         const containerMaxHeight = _rootEl.clientHeight;
 
@@ -110,38 +187,32 @@ export const ToggleDrawer = () => {
             }
         }
         // 서브리스트가 화면 하단을 넘어가지 않도록 top을 조정한다.
-        childrenContainerEl.style.top = adjustedContainerElTop + 'px';
+        subListEl.style.top = adjustedContainerElTop + 'px';
         // 서브리스트가 아이템우측에 바로 위치하도록 clientWidth를 적용한다.
-        childrenContainerEl.style.left = _rootEl.clientWidth + 'px';
+        subListEl.style.left = _rootEl.clientWidth + 'px';
     }
 
-    /* render functions start */
-
+    /**
+     * 토글 버튼을 렌더링한다.
+     */
     function _renderToggleBtn() {
-        const toggleBtnBoxEl = document.createElement('div');
-        toggleBtnBoxEl.classList.add(CLS_TOGGLE_BTN_BOX);
-
-        const btnEl = _options.renderCustomToggleBtn
-            ? _options.renderCustomToggleBtn(toggleBtnBoxEl)
-            : _renderDefaultToggleBtn(toggleBtnBoxEl);
-
+        const btnEl = _options.renderToggleBtn(_toggleBtnBoxEl);
         btnEl.addEventListener('click', () => {
-            changeMode(!_isMini);
+            toggle();
         });
-        _rootEl.appendChild(toggleBtnBoxEl);
     }
 
+    /**
+     * 헤더를 렌더링한다.
+     */
     function _renderHeader() {
-        _headerBoxEl = document.createElement('div');
-        _headerBoxEl.classList.add(CLS_HEADER_BOX);
-        _rootEl.appendChild(_headerBoxEl);
-
-        _options.renderCustomHeader
-            ? _options.renderCustomHeader(_headerBoxEl)
-            : _renderDefaultHeader(_headerBoxEl);
+        _options.renderHeader(_headerBoxEl)
     }
 
-    function _renderMenuItemList() {
+    /**
+     * 메뉴를 렌더링한다.
+     */
+    function _renderMenu() {
         _rootListEl = _renderRootList();
 
         _data.menuItems.map(item => {
@@ -173,8 +244,8 @@ export const ToggleDrawer = () => {
             }
             menuItemBoxEl.appendChild(subListEl);
             menuItemBoxEl.addEventListener('mouseenter', (event) => {
-                if (_isMini) {
-                    _adjustContainerElPosition(item, menuItemBoxEl, subListEl);
+                if (_options.open) {
+                    _adjustSubListElPosition(item, menuItemBoxEl, subListEl);
                 }
             });
         }
@@ -192,7 +263,7 @@ export const ToggleDrawer = () => {
             return;
         }
 
-        if (_options.singleSelect) {
+        if (_options.multiSelection) {
             // deselect every item except the current one and its parents
             const selectedItems = _rootEl.querySelectorAll(`.${CLS_SELECTED}`);
             for (const item of selectedItems) {
@@ -210,97 +281,31 @@ export const ToggleDrawer = () => {
     }
 
     function _renderMenuItem(box: HTMLElement, item: MenuItem, level: number) {
-        const contentContainerEl = document.createElement('div');
-        contentContainerEl.classList.add(CLS_MENU_ITEM_CONTENT);
+        const contentBoxEl = document.createElement('div');
+        contentBoxEl.classList.add(CLS_MENU_ITEM_CONTENT);
 
-        if (_options.renderCustomMenuItemContent) {
-            _options.renderCustomMenuItemContent(contentContainerEl, item, level);
-        }
-        else {
-            const anchorEl = document.createElement('a');
-            anchorEl.classList.add(CLS_MENU_ITEM_ANCHOR);
-            if (item.url)
-                anchorEl.href = item.url;
-            contentContainerEl.appendChild(anchorEl);
-
-            _options.renderCustomAnchorContent
-                ? _options.renderCustomAnchorContent(anchorEl, item, level)
-                : _renderDefaultAnchorContent(anchorEl, item, level);
-        }
+        _options.renderMenuItemContent(contentBoxEl, item, level);
 
         if (item.subList && item.subList.length > 0) {
             const arrowEl = document.createElement('img');
             arrowEl.classList.add(CLS_ARROW_ICON);
             arrowEl.src = angleLeftImg;
-            contentContainerEl.appendChild(arrowEl);
+            contentBoxEl.appendChild(arrowEl);
         }
 
-        box.appendChild(contentContainerEl);
-        return contentContainerEl;
+        box.appendChild(contentBoxEl);
+        return contentBoxEl;
     }
-
-    /* render functions end */
-
-    /* default render functions  start */
-
-    function _renderDefaultToggleBtn(box: HTMLElement) {
-        const toggleBtnEl = document.createElement('img');
-        toggleBtnEl.classList.add(CLS_TOGGLE_BTN);
-        toggleBtnEl.src = barsImg;
-        box.appendChild(toggleBtnEl);
-        return toggleBtnEl;
-    }
-
-    function _renderDefaultHeader(box: HTMLElement) {
-        const header = document.createElement('div');
-        header.classList.add(CLS_DEFAULT_HEADER);
-
-        const basicContent = document.createElement('div');
-        basicContent.classList.add(CLS_HIDE_IN_MINI_MODE);
-        header.appendChild(basicContent);
-
-        const nameEl = document.createElement('div');
-        nameEl.innerText = 'James (P012)';
-        basicContent.appendChild(nameEl);
-
-        const departmentEl = document.createElement('div');
-        departmentEl.innerText = 'System Development Team';
-        basicContent.appendChild(departmentEl);
-
-        const miniContent = document.createElement('div');
-        miniContent.classList.add(CLS_HIDE_IN_NORMAL_MODE);
-        miniContent.innerText = 'TD';
-        header.appendChild(miniContent);
-
-        box.appendChild(header);
-        return header;
-    }
-
-    function _renderDefaultAnchorContent(anchor: HTMLElement, item: MenuItem, level: number) {
-        const iconEl = document.createElement('i');
-        if (item.icon) {
-            iconEl.className = item.icon;
-            iconEl.style.marginRight = '5px';
-        }
-
-        const nameEl = document.createElement('span');
-        nameEl.classList.add(CLS_HIDE_IN_MINI_MODE);
-        nameEl.innerText = item.name;
-
-        anchor.appendChild(iconEl);
-        anchor.appendChild(nameEl);
-    }
-
-    /* default renderers  end */
 
     return {
         create,
         setOptions,
         setData,
         render,
-        changeMode,
         toggle,
-        select
+        select,
+        open: () => changeMode(true),
+        close: () => changeMode(false),
     }
 };
 

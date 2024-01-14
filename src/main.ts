@@ -1,7 +1,11 @@
 import { ToggleDrawer } from "@/lib/t-drawer";
+import { ToggleDrawerData, ToggleDrawerOptions } from "./lib/types";
 
 
-const drawerData = {
+const CLS_MENU_ITEM_ANCHOR = 'td-menu-item-anchor';
+const CLS_HIDE_ON_CLOSE = 'td-hide-on-close';
+const CLS_HIDE_ON_OPEN = 'td-hide-on-open';
+const drawerData: ToggleDrawerData = {
   menuItems: [
     {
       id: '1',
@@ -38,7 +42,7 @@ const drawerData = {
     },
     {
       id: '3',
-      icon: 'fa-solid fa-blog',
+      // icon: 'fa-solid fa-blog',
       name: 'Blog',
       subList: [
         { id: '31', name: `리눅스 분석`, url: 'https://netflixtechblog.com/linux-performance-analysis-in-60-000-milliseconds-accc10403c55' },
@@ -47,94 +51,75 @@ const drawerData = {
       ]
     },
     {
-      id: '4', icon: 'fa fa-cubes', name: '데모',
+      id: '4', icon: 'fa fa-cubes', name: '4번',
       subList: [
-        { name: `1` },
-        { name: `2` },
-        { name: `3` },
-        { name: `4` },
-        { name: `5` },
-        { name: `6` },
-        { name: `7` },
-        { name: `8` },
+        { id: '4-1', name: `1` },
+        { id: '4-2', name: `2` },
+        { id: '4-3', name: `3` },
+        { id: '4-4', name: `4` },
       ]
     },
     {
-      id: '5', icon: 'fa fa-cubes', name: '데모',
+      id: '5', icon: 'fa fa-cubes', name: '5번',
       subList: [
-        { name: `1` },
-        { name: `2` },
-        { name: `3` },
-        { name: `4` },
-        { name: `5` },
-        { name: `6` },
-        { name: `7` },
-        { name: `8` },
+        { id: '5-1', name: `1` },
+        { id: '5-2', name: `2` },
+        { id: '5-3', name: `3` },
+        { id: '5-4', name: `4` },
       ]
     },
     {
-      id: '6', icon: 'fa fa-cubes', name: '데모',
+      id: '6', icon: 'fa fa-cubes', name: '6번',
       subList: [
-        { name: `1` },
-        { name: `2` },
-        { name: `3` },
-        { name: `4` },
-        { name: `5` },
-        { name: `6` },
-        { name: `7` },
-        { name: `8` },
+        { id: '6-1', name: `1` },
+        { id: '6-2', name: `2` },
+        { id: '6-3', name: `3` },
+        { id: '6-4', name: `4` },
       ]
     },
     {
-      id: '7', icon: 'fa fa-cubes', name: '데모',
+      id: '7', icon: 'fa fa-cubes', name: '7번',
       subList: [
-        { name: `1` },
-        { name: `2` },
-        { name: `3` },
-        { name: `4` },
-        { name: `5` },
-        { name: `6` },
-        { name: `7` },
-        { name: `8` },
+        { id: '7-1', name: `1` },
+        { id: '7-2', name: `2` },
+        { id: '7-3', name: `3` },
+        { id: '7-4', name: `4` },
       ]
     },
     {
-      id: '8', icon: 'fa fa-cubes', name: '데모',
+      id: '8', icon: 'fa fa-cubes', name: '8번',
       subList: [
-        { name: `1` },
-        { name: `2` },
-        { name: `3` },
-        { name: `4` },
-        { name: `5` },
-        { name: `6` },
-        { name: `7` },
-        { name: `8` },
+        { id: '8-1', name: `1` },
+        { id: '8-2', name: `2` },
+        { id: '8-3', name: `3` },
+        { id: '8-4', name: `4` },
       ]
     },
     {
-      id: '9', icon: 'fa fa-cubes', name: '데모',
+      id: '9', icon: 'fa fa-cubes', name: '9번',
       subList: [
-        { name: `1` },
-        { name: `2` },
-        { name: `3` },
-        { name: `4` },
-        { name: `5` },
-        { name: `6` },
-        { name: `7` },
-        { name: `8` },
+        { id: '9-1', name: `1` },
+        { id: '9-2', name: `2` },
+        { id: '9-3', name: `3` },
+        { id: '9-4', name: `4` },
       ]
     },
     {
-      id: '10', icon: 'fa fa-cubes', name: '데모',
+      id: '10', icon: 'fa fa-cubes', name: '10번',
       subList: [
-        { name: `1` },
-        { name: `2` },
-        { name: `3` },
-        { name: `4` },
-        { name: `5` },
-        { name: `6` },
-        { name: `7` },
-        { name: `8` },
+        { id: '10-1', name: `1` },
+        { id: '10-2', name: `2` },
+        { id: '10-3', name: `3` },
+        { id: '10-4', name: `4` },
+      ]
+    },
+    {
+      id: '11', icon: 'fa fa-cubes', name: '11번',
+      subList: [
+        { id: '11-1', name: `1` },
+        { id: '11-2', name: `2` },
+        { id: '11-3', name: `3` },
+        { id: '11-4', name: `4` },
       ]
     },
 
@@ -145,8 +130,9 @@ const container = document.querySelector('.drawer-container') as HTMLElement;
 const contentBox = document.querySelector('.content-box');
 const drawer = ToggleDrawer();
 drawer.create(container);
-drawer.setOptions({
-  singleSelect: true,
+
+const options: Partial<ToggleDrawerOptions> = {
+  multiSelection: true,
   showToggleBtn: true,
   onModeChanged: (isMini: any) => {
     if (isMini) {
@@ -155,22 +141,21 @@ drawer.setOptions({
       document.documentElement.style.setProperty('--drawer-width', '300px');
     }
   },
-  renderCustomMenuItemContent: (box: any, item: any, level: any) => {
+  renderMenuItemContent: (box: any, item: any, level: any) => {
     const contentEl = document.createElement('div');
-    contentEl.classList.add('td-menu-item-anchor');
+    contentEl.classList.add(CLS_MENU_ITEM_ANCHOR);
 
     const icon = document.createElement('i');
     icon.className = item.icon;
     icon.style.marginRight = '10px';
     contentEl.appendChild(icon);
 
-    const label = document.createElement('span');
-    label.innerText = item.name;
-    label.className = 'menu-item-label'
-    contentEl.appendChild(label);
+    const nameEl = document.createElement('span');
+    nameEl.classList.add(CLS_HIDE_ON_CLOSE);
+    nameEl.innerText = item.name;
+    contentEl.appendChild(nameEl);
 
     contentEl.addEventListener("click", function () {
-      console.log(item);
       contentBox!.replaceChildren();
       contentBox!.innerHTML = `
                     <h1 class='flex-top'>${item.name} (${item.url})</h1>
@@ -181,8 +166,10 @@ drawer.setOptions({
     box.appendChild(contentEl);
     return contentEl;
   }
-} as any);
+};
+drawer.setOptions(options);
 drawer.setData(drawerData as any);
 drawer.render();
-drawer.select('2-1-2');
-drawer.changeMode(false);
+drawer.select('212');
+// drawer.changeMode(false);
+drawer.close();
