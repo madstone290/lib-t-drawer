@@ -59,6 +59,12 @@ export interface ToggleDrawerOptions {
     onModeChanged(open: boolean): void;
 
     /**
+     * 메뉴 아이템 클릭 핸들러
+     * @param item 
+     */
+    onMenuItemClick(item: MenuItem): void;
+
+    /**
      * 토글 버튼 렌더링 함수. 지정하지 않으면 기본 토글 버튼이 렌더링됨.
      * @param box 토글 버튼이 들어갈 박스 
      * @returns 

@@ -1,10 +1,6 @@
 import { ToggleDrawer } from "@/lib/t-drawer";
 import { MenuItem, ToggleDrawerData, ToggleDrawerOptions } from "./lib/types";
 
-
-const CLS_MENU_ITEM_ANCHOR = 'td-menu-item-anchor';
-const CLS_HIDE_ON_CLOSE = 'td-hide-on-close';
-const CLS_HIDE_ON_OPEN = 'td-hide-on-open';
 const drawerData: ToggleDrawerData = {
   menuItems: [
     {
