@@ -15,13 +15,14 @@ export const ToggleDrawer: () => TDrawer = () => {
     const CLS_MENU_ITEM_BOX = 'td-menu-item-box';
     const CLS_MENU_ITEM_CONTENT = 'td-menu-item-content';
     const CLS_MENU_ITEM_SUB_LIST = 'td-menu-item-sub-list';
-    const CLS_MENU_ITEM_ANCHOR = 'td-menu-item-anchor';
+    const CLS_MENU_ITEM_TEXT = 'td-menu-item-text';
     const CLS_ARROW_ICON = 'td-arrow-icon';
 
     const CLS_LEVEL_PREFIX = 'td-level-';
 
     const CLS_SELECTED = 'td-selected';
     const CLS_OPEN = 'td-open';
+    const CLS_CLOSE = 'td-close';
     const CLS_HIDE_ON_CLOSE = 'td-hide-on-close';
     const CLS_HIDE_ON_OPEN = 'td-hide-on-open';
 
@@ -57,24 +58,34 @@ export const ToggleDrawer: () => TDrawer = () => {
             box.appendChild(header);
             return header;
         },
-        renderMenuItemContent: (box: HTMLElement, item: MenuItem, level: number) => {
-            const anchorEl = document.createElement('div');
-            anchorEl.classList.add(CLS_MENU_ITEM_ANCHOR);
+        renderMenuItemContentText: (box: HTMLElement, item: MenuItem, level: number, open: boolean) => {
+            const textEl = document.createElement('div');
+            textEl.classList.add(CLS_MENU_ITEM_TEXT);
+            textEl.style.paddingLeft = `${(level) * 20}px`;
 
             const iconEl = document.createElement('i');
             if (item.icon) {
                 iconEl.className = item.icon;
                 iconEl.style.marginRight = '4px';
             }
+            if (!open && level === 0) {
+                iconEl.style.fontSize = '20px';
+                iconEl.style.paddingLeft = '20px';
+            }
+            if (open && level === 0) {
+                iconEl.style.paddingLeft = '10px';
+            }
 
-            const nameEl = document.createElement('span');
-            nameEl.classList.add(CLS_HIDE_ON_CLOSE);
-            nameEl.innerText = item.name;
+            textEl.appendChild(iconEl);
 
-            anchorEl.appendChild(iconEl);
-            anchorEl.appendChild(nameEl);
-            box.appendChild(anchorEl);
-            return anchorEl;
+            if (open || level !== 0) {
+                const nameEl = document.createElement('span');
+                nameEl.innerText = item.name;
+                textEl.appendChild(nameEl);
+            }
+
+            box.appendChild(textEl);
+            return textEl;
         },
         onMenuItemClick: (item: MenuItem) => { console.log(item) },
     }
@@ -149,9 +160,11 @@ export const ToggleDrawer: () => TDrawer = () => {
     function changeMode(open: boolean) {
         if (open) {
             _rootEl.classList.add(CLS_OPEN);
+            _rootEl.classList.remove(CLS_CLOSE);
 
         } else {
             _rootEl.classList.remove(CLS_OPEN);
+            _rootEl.classList.add(CLS_CLOSE);
         }
         if (_options.onModeChanged)
             _options.onModeChanged(open);
@@ -178,6 +191,7 @@ export const ToggleDrawer: () => TDrawer = () => {
     function _adjustSubListElPosition(item: MenuItem, itemEl: HTMLElement, subListEl: HTMLElement) {
         if (!item.subList)
             return;
+        console.log(_rootEl.getBoundingClientRect());
         const containerElHeight = subListEl.offsetHeight;
         const initialContainerElTop = itemEl.offsetTop - _rootEl.scrollTop;
         const containerMaxHeight = _rootEl.clientHeight;
@@ -249,7 +263,7 @@ export const ToggleDrawer: () => TDrawer = () => {
             }
             menuItemEl.appendChild(subListEl);
             menuItemEl.addEventListener('mouseenter', (event) => {
-                if (_options.open) {
+                if (!_options.open) {
                     _adjustSubListElPosition(item, menuItemEl, subListEl);
                 }
             });
@@ -289,7 +303,11 @@ export const ToggleDrawer: () => TDrawer = () => {
         const contentBoxEl = document.createElement('div');
         contentBoxEl.classList.add(CLS_MENU_ITEM_CONTENT);
 
-        _options.renderMenuItemContent(contentBoxEl, item, level);
+        const contenEl_Open = _options.renderMenuItemContentText(contentBoxEl, item, level, true);
+        contenEl_Open.classList.add(CLS_HIDE_ON_CLOSE);
+
+        const contentEl_Close = _options.renderMenuItemContentText(contentBoxEl, item, level, false);
+        contentEl_Close.classList.add(CLS_HIDE_ON_OPEN);
 
         if (item.subList && item.subList.length > 0) {
             const arrowEl = document.createElement('img');

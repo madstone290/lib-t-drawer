@@ -79,11 +79,13 @@ export interface ToggleDrawerOptions {
     renderHeader: (box: HTMLElement) => HTMLElement;
 
     /**
-     * 메뉴 아이템 컨텐츠를 렌더링하는 함수. 지정하지 않으면 기본 메뉴 아이템 컨텐츠가 렌더링됨.
-     * @param box
-     * @param item 
-     * @param level 
-     * @returns 
+     * 메뉴 아이템 컨텐츠 텍스트를 렌더링하는 함수. 지정하지 않으면 기본 메뉴 아이템 컨텐츠가 렌더링됨.
+     * 열림 상태에 따라 다른 텍스트를 렌더링할 수 있음.
+     * @param box 텍스트가 들어갈 박스 엘리먼트
+     * @param item 메뉴 아이템 정보
+     * @param level 메뉴 레벨. 루트 메뉴가 0부터 시작함.
+     * @param open 메뉴 열림 상태
+     * @returns
      */
-    renderMenuItemContent: (box: HTMLElement, item: MenuItem, level: number) => HTMLElement;
+    renderMenuItemContentText: (box: HTMLElement, item: MenuItem, level: number, open: boolean) => HTMLElement;
 }
