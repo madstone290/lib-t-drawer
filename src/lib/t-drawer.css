@@ -168,6 +168,11 @@
     height: var(--root-menu-item-height);
 }
 
+.td-menu-item-content-inner {
+    width: 100%;
+    height: 100%;
+}
+
 .td-arrow-icon {
     padding-right: 10px;
 }

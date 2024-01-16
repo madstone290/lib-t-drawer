@@ -131,34 +131,37 @@ const options: Partial<ToggleDrawerOptions> = {
     multiSelection: true,
     showToggleBtn: true,
     showHeader: true,
-    renderMenuItemContentText: (box: HTMLElement, item: MenuItem, level: number, open: boolean) => {
-        const contentEl = document.createElement('a');
-        contentEl.style.width = '100%';
-        if (item.url)
-            contentEl.href = item.url!;
+    // renderMenuItemContentText: (box: HTMLElement, item: MenuItem, level: number, open: boolean) => {
+    //     const contentEl = document.createElement('a');
+    //     contentEl.style.width = '100%';
+    //     contentEl.style.height = '100%';
+    //     contentEl.style.display = 'flex';
+    //     contentEl.style.alignItems = 'center';
+    //     if (item.url)
+    //         contentEl.href = item.url!;
 
-        const iconEl = document.createElement('i');
-        if (item.icon) {
-            iconEl.className = item.icon;
-        }
-        iconEl.style.paddingLeft = `${(level + 1) * 10}px`;
-        iconEl.style.marginRight = '10px';
+    //     const iconEl = document.createElement('i');
+    //     if (item.icon) {
+    //         iconEl.className = item.icon;
+    //     }
+    //     iconEl.style.paddingLeft = `${(level + 1) * 10}px`;
+    //     iconEl.style.marginRight = '10px';
 
-        if (!open) {
-            iconEl.style.fontSize = '20px';
-            iconEl.style.paddingLeft = '20px';
-        }
-        contentEl.appendChild(iconEl);
+    //     if (!open) {
+    //         iconEl.style.fontSize = '20px';
+    //         iconEl.style.paddingLeft = '20px';
+    //     }
+    //     contentEl.appendChild(iconEl);
 
-        if (open || level !== 0) {
-            const label = document.createElement('span');
-            label.innerText = item.name;
-            contentEl.appendChild(label);
-        }
+    //     if (open || level !== 0) {
+    //         const label = document.createElement('span');
+    //         label.innerText = item.name;
+    //         contentEl.appendChild(label);
+    //     }
 
-        box.appendChild(contentEl);
-        return contentEl;
-    },
+    //     box.appendChild(contentEl);
+    //     return contentEl;
+    // },
     onModeChanged: (open: boolean) => {
         if (open) {
             document.documentElement.style.setProperty('--drawer-width', '300px');
