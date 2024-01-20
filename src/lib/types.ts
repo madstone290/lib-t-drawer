@@ -33,24 +33,19 @@ export interface ToggleDrawerOptions {
     multiSelection: boolean;
 
     /**
-     * 드로어 토글 버튼 표시 여부. 기본값은 true.
+     * 토글 버튼 설정
      */
-    showToggleBtn: boolean;
+    toggleBtn: {
+        /** 토글 버튼 sticky 포지션 적용여부 */
+        sticky: boolean;
+        /** 토글 버튼 활성화 여부 */
+        enabled: boolean;
+    }
 
     /**
      * 드로어 헤더 표시 여부. 기본값은 true.
      */
     showHeader: boolean;
-
-    /**
-     * 드로어 열림 상태일 때 헤더 텍스트. 기본값은 Toggle Drawer
-     */
-    headerTextOpen: string;
-
-    /**
-     * 드로어 닫힘 상태일 때 헤더 텍스트. 기본값은 T/D
-     */
-    headerTextClosed: string;
 
     /**
      * 드로어 열림 상태 변경 이벤트
@@ -74,9 +69,10 @@ export interface ToggleDrawerOptions {
     /**
      * 헤더 렌더링 함수. 지정하지 않으면 기본 헤더가 렌더링됨.
      * @param box 헤더 엘리먼트가 들어갈 박스
+     * @param open 메뉴 열림 상태
      * @returns 
      */
-    renderHeader: (box: HTMLElement) => HTMLElement;
+    renderHeader: (box: HTMLElement, open: boolean) => HTMLElement;
 
     /**
      * 메뉴 아이템 컨텐츠 텍스트를 렌더링하는 함수. 지정하지 않으면 기본 메뉴 아이템 컨텐츠가 렌더링됨.

@@ -21,20 +21,20 @@ export const ToggleDrawer: () => TDrawer = () => {
 
     const CLS_LEVEL_PREFIX = 'td-level-';
 
+    const CLS_STICKY = 'td-sticky';
+
     const CLS_SELECTED = 'td-selected';
     const CLS_OPEN = 'td-open';
     const CLS_CLOSE = 'td-close';
 
-    const CLS_HIDE_ON_CLOSE = 'td-hide-on-close';
-    const CLS_HIDE_ON_OPEN = 'td-hide-on-open';
-
     const _options: ToggleDrawerOptions = {
         open: false,
         multiSelection: false,
-        showToggleBtn: true,
+        toggleBtn: {
+            sticky: true,
+            enabled: true,
+        },
         showHeader: true,
-        headerTextOpen: 'Toggle Drawer',
-        headerTextClosed: 'T/D',
         onModeChanged: () => { },
         renderToggleBtn: (box: HTMLElement) => {
             const toggleBtnEl = document.createElement('img');
@@ -43,19 +43,17 @@ export const ToggleDrawer: () => TDrawer = () => {
             box.appendChild(toggleBtnEl);
             return toggleBtnEl;
         },
-        renderHeader: (box: HTMLElement) => {
+        renderHeader: (box: HTMLElement, open: boolean) => {
             const header = document.createElement('div');
             header.classList.add(CLS_DEFAULT_HEADER);
 
-            const textOpenEl = document.createElement('div');
-            textOpenEl.classList.add(CLS_HIDE_ON_CLOSE);
-            textOpenEl.innerText = _options.headerTextOpen;
-            header.appendChild(textOpenEl);
-
-            const textCloseEl = document.createElement('div');
-            textCloseEl.classList.add(CLS_HIDE_ON_OPEN);
-            textCloseEl.innerText = _options.headerTextClosed;
-            header.appendChild(textCloseEl);
+            const textEl = document.createElement('div');
+            if (open) {
+                textEl.innerText = "T-Drawer Open";
+            } else {
+                textEl.innerText = "TD";
+            }
+            header.appendChild(textEl);
 
             box.appendChild(header);
             return header;
@@ -101,6 +99,8 @@ export const ToggleDrawer: () => TDrawer = () => {
     let _headerBoxEl: HTMLElement;
     let _rootListEl: HTMLElement;
 
+    let _selectedMenuItemId: string | null = null;
+
     function create(container: HTMLElement) {
         _rootEl = document.createElement('div');
         _rootEl.classList.add(CLS_ROOT);
@@ -113,6 +113,10 @@ export const ToggleDrawer: () => TDrawer = () => {
         _headerBoxEl.classList.add(CLS_HEADER_BOX);
         _rootEl.appendChild(_headerBoxEl);
 
+        _rootListEl = document.createElement('div');
+        _rootListEl.classList.add(`${CLS_ROOT_LIST}`);
+        _rootEl.appendChild(_rootListEl);
+
         container.appendChild(_rootEl);
     }
 
@@ -124,8 +128,14 @@ export const ToggleDrawer: () => TDrawer = () => {
         Object.assign(_data, data);
     }
 
-    function render() {
-        if (_options.showToggleBtn) {
+    function _clearElements() {
+        _toggleBtnBoxEl.replaceChildren();
+        _headerBoxEl.replaceChildren();
+        _rootListEl.replaceChildren();
+    }
+
+    function _renderElements() {
+        if (_options.toggleBtn?.enabled) {
             _renderToggleBtn();
         }
 
@@ -136,7 +146,7 @@ export const ToggleDrawer: () => TDrawer = () => {
         _renderMenu();
     }
 
-    function select(id: string) {
+    function select(id: string | null) {
         let itemBoxEl = _rootEl.querySelector(`[data-id="${id}"]`) as HTMLElement;
         _selectMenuItem(itemBoxEl);
     }
@@ -160,27 +170,32 @@ export const ToggleDrawer: () => TDrawer = () => {
      * @param open 열림 상태
      */
     function changeMode(open: boolean) {
-        if (open) {
-            _rootEl.classList.add(CLS_OPEN);
-            _rootEl.classList.remove(CLS_CLOSE);
+        _options.open = open;
 
-        } else {
-            _rootEl.classList.remove(CLS_OPEN);
-            _rootEl.classList.add(CLS_CLOSE);
-        }
+        render();
+
         if (_options.onModeChanged)
             _options.onModeChanged(open);
-        _options.open = open;
     }
 
     /**
-     * 리스트 루트 엘리먼트를 렌더링한다.
-     * @returns 
+     * 드로어를 렌더링한다.
      */
-    function _renderRootList() {
-        const rootListEl = document.createElement('div');
-        rootListEl.classList.add(`${CLS_ROOT_LIST}`);
-        return rootListEl;
+    function render() {
+        if (_options.open) {
+            _rootEl.classList.add(CLS_OPEN);
+            _rootEl.classList.remove(CLS_CLOSE);
+        }
+        else {
+            _rootEl.classList.remove(CLS_OPEN);
+            _rootEl.classList.add(CLS_CLOSE);
+        }
+
+        /** 이전 요소들을 제거하고 새로 렌더링한다 */
+        _clearElements();
+        _renderElements();
+        select(_selectedMenuItemId);
+
     }
 
     /**
@@ -193,7 +208,6 @@ export const ToggleDrawer: () => TDrawer = () => {
     function _adjustSubListElPosition(item: MenuItem, itemEl: HTMLElement, subListEl: HTMLElement) {
         if (!item.subList)
             return;
-        console.log(_rootEl.getBoundingClientRect());
         const containerElHeight = subListEl.offsetHeight;
         const initialContainerElTop = itemEl.offsetTop - _rootEl.scrollTop;
         const containerMaxHeight = _rootEl.clientHeight;
@@ -215,6 +229,11 @@ export const ToggleDrawer: () => TDrawer = () => {
      * 토글 버튼을 렌더링한다.
      */
     function _renderToggleBtn() {
+        if (_options.toggleBtn?.sticky)
+            _toggleBtnBoxEl.classList.add(CLS_STICKY);
+        else
+            _toggleBtnBoxEl.classList.remove(CLS_STICKY);
+
         const btnEl = _options.renderToggleBtn(_toggleBtnBoxEl);
         btnEl.addEventListener('click', () => {
             toggle();
@@ -225,15 +244,13 @@ export const ToggleDrawer: () => TDrawer = () => {
      * 헤더를 렌더링한다.
      */
     function _renderHeader() {
-        _options.renderHeader(_headerBoxEl)
+        _options.renderHeader(_headerBoxEl, _options.open);
     }
 
     /**
      * 메뉴를 렌더링한다.
      */
     function _renderMenu() {
-        _rootListEl = _renderRootList();
-
         _data.menuItems.map(item => {
             const itemBox = _renderMenuItem(item, 0);
             _rootListEl.appendChild(itemBox);
@@ -274,24 +291,25 @@ export const ToggleDrawer: () => TDrawer = () => {
         return menuItemEl;
     }
 
-    function _selectMenuItem(menuItemBoxEl: HTMLElement) {
+
+    function _selectMenuItem(menuItemBoxEl?: HTMLElement) {
         if (!menuItemBoxEl)
             return;
 
         // if the item is already selected, deselect it
         if (menuItemBoxEl.classList.contains(CLS_SELECTED)) {
             menuItemBoxEl.classList.remove(CLS_SELECTED);
+            _selectedMenuItemId = null;
             return;
         }
 
-        if (_options.multiSelection) {
+        if (!_options.multiSelection) {
             // deselect every item except the current one and its parents
             const selectedItems = _rootEl.querySelectorAll(`.${CLS_SELECTED}`);
             for (const item of selectedItems) {
                 item.classList.remove(CLS_SELECTED);
             }
         }
-
         // select the current item and its parents
         let parentItemBoxEl = _findParentItemBoxEl(menuItemBoxEl);
         while (parentItemBoxEl) {
@@ -299,23 +317,23 @@ export const ToggleDrawer: () => TDrawer = () => {
             parentItemBoxEl = _findParentItemBoxEl(parentItemBoxEl);
         }
         menuItemBoxEl.classList.add(CLS_SELECTED);
+        _selectedMenuItemId = menuItemBoxEl.getAttribute('data-id')!;
     }
 
     function _renderMenuItemContent(box: HTMLElement, item: MenuItem, level: number) {
         const contentBoxEl = document.createElement('div');
         contentBoxEl.classList.add(CLS_MENU_ITEM_CONTENT);
 
-        const openContentEl = document.createElement('div');
-        openContentEl.classList.add(CLS_MENU_ITEM_CONTENT_INNER)
-        openContentEl.classList.add(CLS_HIDE_ON_CLOSE);
-        openContentEl.appendChild(_options.renderMenuItemContentText(contentBoxEl, item, level, true));
-        contentBoxEl.appendChild(openContentEl);
-
-        const closeContentEl = document.createElement('div');
-        closeContentEl.classList.add(CLS_MENU_ITEM_CONTENT_INNER)
-        closeContentEl.classList.add(CLS_HIDE_ON_OPEN);
-        closeContentEl.appendChild(_options.renderMenuItemContentText(contentBoxEl, item, level, false));
-        contentBoxEl.appendChild(closeContentEl);
+        const contentEl = document.createElement('div');
+        contentEl.classList.add(CLS_MENU_ITEM_CONTENT_INNER)
+        if (_options.open) {
+            // contentEl.classList.add(CLS_HIDE_ON_CLOSE);
+            contentEl.appendChild(_options.renderMenuItemContentText(contentBoxEl, item, level, true));
+        } else {
+            // contentEl.classList.add(CLS_HIDE_ON_OPEN);
+            contentEl.appendChild(_options.renderMenuItemContentText(contentBoxEl, item, level, false));
+        }
+        contentBoxEl.appendChild(contentEl);
 
         if (item.subList && item.subList.length > 0) {
             const arrowEl = document.createElement('img');

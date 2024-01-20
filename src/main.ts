@@ -122,46 +122,54 @@ const drawerData: ToggleDrawerData = {
 
     ]
 };
+
+function customRenderMenuItemContentText(box: HTMLElement, item: MenuItem, level: number, open: boolean) {
+    const contentEl = document.createElement('a');
+    contentEl.style.width = '100%';
+    contentEl.style.height = '100%';
+    contentEl.style.display = 'flex';
+    contentEl.style.alignItems = 'center';
+    if (item.url)
+        contentEl.href = item.url!;
+
+    const iconEl = document.createElement('i');
+    if (item.icon) {
+        iconEl.className = item.icon;
+    }
+    iconEl.style.paddingLeft = `${(level + 1) * 10}px`;
+    iconEl.style.marginRight = '10px';
+
+    if (!open) {
+        iconEl.style.fontSize = '20px';
+        iconEl.style.paddingLeft = '20px';
+    }
+    contentEl.appendChild(iconEl);
+
+    if (open || level !== 0) {
+        const label = document.createElement('span');
+        label.innerText = item.name;
+        contentEl.appendChild(label);
+    }
+
+    box.appendChild(contentEl);
+    return contentEl;
+}
+
+
 const container = document.querySelector('.drawer-container') as HTMLElement;
 const contentBox = document.querySelector('.content-box');
 const drawer = ToggleDrawer();
 drawer.create(container);
 
 const options: Partial<ToggleDrawerOptions> = {
-    multiSelection: true,
-    showToggleBtn: true,
+    multiSelection: false,
+    toggleBtn: {
+        sticky: true,
+        enabled: true
+    },
     showHeader: true,
-    // renderMenuItemContentText: (box: HTMLElement, item: MenuItem, level: number, open: boolean) => {
-    //     const contentEl = document.createElement('a');
-    //     contentEl.style.width = '100%';
-    //     contentEl.style.height = '100%';
-    //     contentEl.style.display = 'flex';
-    //     contentEl.style.alignItems = 'center';
-    //     if (item.url)
-    //         contentEl.href = item.url!;
-
-    //     const iconEl = document.createElement('i');
-    //     if (item.icon) {
-    //         iconEl.className = item.icon;
-    //     }
-    //     iconEl.style.paddingLeft = `${(level + 1) * 10}px`;
-    //     iconEl.style.marginRight = '10px';
-
-    //     if (!open) {
-    //         iconEl.style.fontSize = '20px';
-    //         iconEl.style.paddingLeft = '20px';
-    //     }
-    //     contentEl.appendChild(iconEl);
-
-    //     if (open || level !== 0) {
-    //         const label = document.createElement('span');
-    //         label.innerText = item.name;
-    //         contentEl.appendChild(label);
-    //     }
-
-    //     box.appendChild(contentEl);
-    //     return contentEl;
-    // },
+    open: true,
+    renderMenuItemContentText: customRenderMenuItemContentText,
     onModeChanged: (open: boolean) => {
         if (open) {
             document.documentElement.style.setProperty('--drawer-width', '300px');
@@ -194,5 +202,3 @@ drawer.setData(drawerData as any);
 drawer.render();
 drawer.select('13');
 options.onMenuItemClick!(drawerData.menuItems[0].subList![2]);
-// drawer.changeMode(false);
-drawer.close();
