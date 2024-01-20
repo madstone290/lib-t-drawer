@@ -123,6 +123,7 @@ const drawerData: ToggleDrawerData = {
     ]
 };
 
+/*
 function customRenderMenuItemContentText(box: HTMLElement, item: MenuItem, level: number, open: boolean) {
     const contentEl = document.createElement('a');
     contentEl.style.width = '100%';
@@ -154,6 +155,7 @@ function customRenderMenuItemContentText(box: HTMLElement, item: MenuItem, level
     box.appendChild(contentEl);
     return contentEl;
 }
+*/
 
 
 const container = document.querySelector('.drawer-container') as HTMLElement;
