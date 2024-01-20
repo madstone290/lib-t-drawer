@@ -38,7 +38,7 @@ const drawerData: ToggleDrawerData = {
         },
         {
             id: '3',
-            // icon: 'fa-solid fa-blog',
+            icon: 'fa-solid fa-blog',
             name: 'Blog',
             subList: [
                 { id: '31', name: `리눅스 분석`, url: 'https://netflixtechblog.com/linux-performance-analysis-in-60-000-milliseconds-accc10403c55' },
@@ -169,7 +169,8 @@ const options: Partial<ToggleDrawerOptions> = {
     },
     showHeader: true,
     open: true,
-    renderMenuItemContentText: customRenderMenuItemContentText,
+    // 커스텀 렌더링이 필요한 경우 활성화
+    //renderMenuItemContentText: customRenderMenuItemContentText,
     onModeChanged: (open: boolean) => {
         if (open) {
             document.documentElement.style.setProperty('--drawer-width', '300px');
@@ -183,8 +184,8 @@ const options: Partial<ToggleDrawerOptions> = {
         if (item.id[0] === '1' || item.id[0] === '2' || item.id[0] === '3') {
             contentBox!.replaceChildren();
             contentBox!.innerHTML = `
-                  <h1 class='flex-top'>${item.name} (${item.url})</h1>
-                  <iframe class='flex-fill' src="${item.url}" width="100%" height="100%" frameborder="0" ></iframe>
+                <h1 class='flex-top'>id: ${item.id}, name: ${item.name}, url: ${item.url}</h1>
+                <iframe class='flex-fill' src="${item.url}" width="100%" height="100%" frameborder="0" ></iframe>
               `;
         }
         else {
